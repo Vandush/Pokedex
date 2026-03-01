@@ -8,6 +8,12 @@ import (
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+
+	cfg := &config{
+		NextUrl: nil,
+		PrevUrl: nil,
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -21,7 +27,7 @@ func main() {
 			if ok == false {
 				fmt.Println("Unknown command")
 			} else {
-				key.callback()
+				key.callback(cfg)
 			}
 		}
 	}
