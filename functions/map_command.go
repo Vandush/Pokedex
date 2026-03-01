@@ -1,30 +1,15 @@
-package main
+package functions
 
 import (
-	"strings"
-	"os"
 	"fmt"
 	"net/http"
 	"io"
 	"encoding/json"
+	"github.com/Vandush/pokedexcli/config"
+
 )
 
-type PokedexAPI struct {
-	Count int `json:"count"`
-	Next *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results []struct {
-		Name string `json:"name"`
-		Url string `json:"url"`
-	} `json:"results"`
-}
-
-type config struct {
-	NextUrl *string
-	PrevUrl *string
-}
-
-func CommandMap(c *config) error {
+func CommandMap(c *config.Config) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if c.NextUrl != nil {
 		url = string(*c.NextUrl)
@@ -39,7 +24,7 @@ func CommandMap(c *config) error {
 	if err != nil {
 		return err
 	}
-	locations := PokedexAPI{}
+	locations := config.PokedexAPI{}
 	if err := json.Unmarshal(data, &locations); err != nil {
 		fmt.Printf("Unmarshal: %v\n", err)
 		return nil
@@ -52,14 +37,13 @@ func CommandMap(c *config) error {
 	return nil
 }
 
-func CommandMapBack(c *config) error {
+func CommandMapBack(c *config.Config) error {
 	if c.PrevUrl == nil {
 		fmt.Println("You're on the first page.")
 		return nil
 	}
 
 	url := string(*c.PrevUrl)
-
 	response, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("Response: %v\n", err)
@@ -70,7 +54,7 @@ func CommandMapBack(c *config) error {
 	if err != nil {
 		return err
 	}
-	locations := PokedexAPI{}
+	locations := config.PokedexAPI{}
 	if err := json.Unmarshal(data, &locations); err != nil {
 		fmt.Printf("Unmarshal: %v\n", err)
 		return nil
@@ -83,26 +67,4 @@ func CommandMapBack(c *config) error {
 	return nil
 }
 
-func CommandHelp(c *config) error {
-	m := GetCommands()
-	fmt.Println("Welcome to the Pokedex!\nUsage:\n")
-	for _, value := range m {
-		fmt.Printf("%s: %s\n", value.name, value.description)
-	}
-	return nil
-}
 
-func CommandExit(c *config) error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func CleanInput(text string) []string {
-	var list []string
-	list = strings.Fields(text)
-	for i, text := range list {
-		list[i] = strings.ToLower(text)
-	}
-	return list
-}

@@ -1,9 +1,13 @@
-package main
+package functions
+
+import (
+	"github.com/Vandush/pokedexcli/config"
+)
 
 type cliCommand struct {
 	name string
 	description string
-	callback func(*config) error
+	Callback func(*config.Config) error
 }
 
 func GetCommands() map[string]cliCommand {
@@ -11,22 +15,22 @@ func GetCommands() map[string]cliCommand {
 		"map": {
 			name: "map",
 			description: "List twenty locations.",
-			callback: CommandMap,
+			Callback: CommandMap,
 		},
 		"mapb": {
 			name: "mapb",
 			description: "List the previous locations.",
-			callback: CommandMapBack,
+			Callback: CommandMapBack,
 		},
 		"exit": {
 			name: "exit",
 			description: "Exit the Pokedex",
-			callback: CommandExit,
+			Callback: CommandExit,
 		},
 		"help": {
 			name: "help",
 			description: "Displays a help message",
-			callback: CommandHelp,
+			Callback: CommandHelp,
 		},
 	}
 }

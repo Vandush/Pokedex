@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"bufio"
 	"os"
+	"github.com/Vandush/pokedexcli/config"
+	"github.com/Vandush/pokedexcli/functions"
 )
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	cfg := &config{
+	cfg := &config.Config{
 		NextUrl: nil,
 		PrevUrl: nil,
 	}
@@ -18,16 +20,16 @@ func main() {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
-		cleaned := CleanInput(input)
+		cleaned := functions.CleanInput(input)
 		if len(cleaned) == 0 {
 			fmt.Println("No input")
 		} else {
-			commands := GetCommands()
+			commands := functions.GetCommands()
 			key, ok := commands[cleaned[0]]
 			if ok == false {
 				fmt.Println("Unknown command")
 			} else {
-				key.callback(cfg)
+				key.Callback(cfg)
 			}
 		}
 	}
