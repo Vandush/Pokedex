@@ -1,7 +1,8 @@
 package functions
 
-import "testing"
-
+import (
+	"testing"
+) 
 func TestCleanInput(t *testing.T) {
 	cases := []struct {
 		input    string
@@ -21,7 +22,7 @@ func TestCleanInput(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		actual := cleanInput(c.input)
+		actual := CleanInput(c.input)
 		if len(actual) != len(c.expected) {
 			t.Errorf("Expected: %v, Actual: %v", c.expected, actual)
 		}

@@ -2,68 +2,42 @@ package functions
 
 import (
 	"fmt"
-	"net/http"
-	"io"
-	"encoding/json"
 	"github.com/Vandush/pokedexcli/config"
-
+	"github.com/Vandush/pokedexcli/pokecache"
 )
 
-func CommandMap(c *config.Config) error {
+func CommandMap(cfg *config.Config, cache *pokecache.Cache, _ []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
-	if c.NextUrl != nil {
-		url = string(*c.NextUrl)
+	if cfg.NextUrl != nil {
+		url = string(*cfg.NextUrl)
 	}
-	response, err := http.Get(url)
-	if err != nil {
-		fmt.Printf("Response: %v\n", err)
-		return nil
-	}
-	defer response.Body.Close()
-	data, err := io.ReadAll(response.Body)
+	locations, err := config.CallEndpointAPI(url, cache)
 	if err != nil {
 		return err
-	}
-	locations := config.PokedexAPI{}
-	if err := json.Unmarshal(data, &locations); err != nil {
-		fmt.Printf("Unmarshal: %v\n", err)
-		return nil
 	}
 	for _, location := range locations.Results {
 		fmt.Printf("%s\n",location.Name)
 	}
-	c.NextUrl = locations.Next
-	c.PrevUrl = locations.Previous
+	cfg.NextUrl = locations.Next
+	cfg.PrevUrl = locations.Previous
 	return nil
 }
 
-func CommandMapBack(c *config.Config) error {
-	if c.PrevUrl == nil {
+func CommandMapBack(cfg *config.Config, cache *pokecache.Cache, _ []string) error {
+	if cfg.PrevUrl == nil {
 		fmt.Println("You're on the first page.")
 		return nil
 	}
-
-	url := string(*c.PrevUrl)
-	response, err := http.Get(url)
-	if err != nil {
-		fmt.Printf("Response: %v\n", err)
-		return nil
-	}
-	defer response.Body.Close()
-	data, err := io.ReadAll(response.Body)
+	url := string(*cfg.PrevUrl)
+	locations, err := config.CallEndpointAPI(url, cache)
 	if err != nil {
 		return err
-	}
-	locations := config.PokedexAPI{}
-	if err := json.Unmarshal(data, &locations); err != nil {
-		fmt.Printf("Unmarshal: %v\n", err)
-		return nil
 	}
 	for _, location := range locations.Results {
 		fmt.Printf("%s\n",location.Name)
 	}
-	c.NextUrl = locations.Next
-	c.PrevUrl = locations.Previous
+	cfg.NextUrl = locations.Next
+	cfg.PrevUrl = locations.Previous
 	return nil
 }
 
